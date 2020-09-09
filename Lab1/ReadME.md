@@ -8,7 +8,7 @@ COSC 420-001
 * Explore empirical tests for program efficiency in terms of parallel computation and resources
  
 
-Lab Description:
+## Lab Description:
 This lab demonstrates beginner knowledge of the MPI (Message Passing Interface) library. The
 first program is a hello world program written in C that is used to get our feet wet in the C
 language as well as understand what it means for MPI to create multiple nodes and run various
