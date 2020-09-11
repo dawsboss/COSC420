@@ -7,6 +7,7 @@
 
 /* Run stuff:
  *  module avial
+ *  module load *
  *  mpicc *filename*
  *  mpiexec -n *# of nodes* ./running* *args*
  */
