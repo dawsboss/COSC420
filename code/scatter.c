@@ -80,12 +80,13 @@ int main(int argc, char** argv) {
     printf("I am node %d and my is %s", myRank, buf);
 
 
-    MPI_Finalize(); // Finalizing MPI
     free(local_arr);
     
     if(myRank == 0){
       free(arr);
     }
     free(buf);
+    
+    MPI_Finalize(); // Finalizing MPI
     return 0;
 }
