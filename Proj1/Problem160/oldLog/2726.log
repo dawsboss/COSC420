@@ -1,0 +1,3 @@
+srun: Warning: can't honor --ntasks-per-node set to 10 which doesn't match the requested tasks 25 with the number of requested nodes 25. Ignoring --ntasks-per-node.
+eeR 97472
+WORLD SIZE: 250

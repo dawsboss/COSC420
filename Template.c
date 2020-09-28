@@ -16,7 +16,7 @@ int main(int argc, char** argv) {
 
     MPI_Comm_size(world, &worldSize); // Gives amount of nodes running in parallel
     MPI_Comm_rank(world, &myRank); // Gives the rank (number) node
-    MPI_Get_processor_name(processorName, &processSize); 
+    // MPI_Get_processor_name(processorName, &processSize); 
     srand(time(0));                           // Gives the processor name of current node
 
     
