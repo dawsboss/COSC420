@@ -3,7 +3,7 @@
 #SBATCH --job-name=GrantProject1Problem160
 ##SBATCH --nodes=25
 ##SBATCH --ntasks-per-node=10
-#SBATCH --ntasks=250
+#SBATCH --ntasks=100
 #SBATCH --mem=2gb
 #SBATCH --time=05:05:00
 #SBATCH --output=out/%j.log
