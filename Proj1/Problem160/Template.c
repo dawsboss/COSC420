@@ -12,19 +12,40 @@
 #define pNameSize MPI_MAX_PROCESSOR_NAME
 
 typedef unsigned long long boi;
+typedef int bool;
+#define true 1
+#define false 0
 
 static boi lim = 4294967295;
 
-boi overflow(boi a, boi b, int mod){
+boi overflow(boi a, boi b, int mod, bool first){
+    boi rtn;
     //puts("overflew");
-    if (a>lim || b>lim) {
-        puts("Nothing should have overflew");
+    if(a==0 || b==0)
+      return 0;
+    if (a>lim) {
+        puts("a>lim");
         boi k = a/lim;
         boi rem = a%lim;
         printf("k %llu, rem %llu, a %llu, b %llu\n", k, rem, a, b);
-        return (overflow(overflow(b,k, mod), lim, mod) + overflow(b, rem, mod));
+        rtn = (overflow(overflow(k,b, mod, false), lim, mod, false) + overflow(rem, b, mod, false));
+    }else if(b>lim){
+        puts("b>lim");
+        boi k = b/lim;
+        boi rem = b%lim;
+        printf("k %llu, rem %llu, a %llu, b %llu\n", k, rem, a, b);    
+        rtn = (overflow(overflow(k,a, mod, false), lim, mod, false) + overflow(rem, a, mod, false));
+    }else{
+        rtn = (a*b);
     }
-    boi rtn = a*b;
+    printf("rtn Before: %llu, a: %llu, b: %llu\n", rtn,a,b);
+    
+    if(first){
+        while(rtn%10 == 0)
+            rtn/=10;
+        printf("rtn After: %llu\n", rtn);
+    }
+    rtn%=100000;
     return rtn;
 }
 
@@ -44,7 +65,7 @@ boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
     boi finish;
     boi local_fact=1;
     boi rtn=1;
-    boi compare_fact = 1;
+    //boi compare_fact = 1;
 
     if(Rank == 0){
         start = (boi)2;
@@ -59,7 +80,7 @@ boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
     }
 
        
-    boi i, stuff;
+    boi i;
     //puts("BEfor for loop");
     printf("Rank: %d | Start: %llu | Finish: %llu\n", Rank, start, finish);
     //start %= 100000;
@@ -73,40 +94,40 @@ boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
     
     //printf("Rank: %d | Start: %llu | Finish: %llu\n", Rank, start, finish);
     for(i=start; i<=finish; i++){
-        stuff = i;
+        //stuff = i;
 
-        while(stuff % 10 == 0)
-            stuff /= 10;
-        stuff %= 100000;
+        //while(stuff % 10 == 0)
+        //    stuff /= 10;
+        //stuff %= 100000;
 
-        //local_fact = overflow(local_fact, i, 100000);
-        local_fact *= stuff;
+        local_fact = overflow(local_fact, i, 100000, true);
+        //local_fact *= stuff;
         //  printf("local_fact *= %zu: %zu\n",i,local_fact);
-        while(local_fact % 10 == 0)
-            local_fact /= 10;
-        local_fact %= 100000;
+        //while(local_fact % 10 == 0)
+        //    local_fact /= 10;
+        //local_fact %= 100000;
         //    puts("local_fact >= 100000");
        
         //if(i%200000 == 0){
         //    printf("%zu\n", i);
         //}
     }
-    puts("after first for loop");
-    for(i=start; i<=finish; i++){
-      compare_fact *= i;  
+    //puts("after first for loop");
+    //for(i=start; i<=finish; i++){
+    //  compare_fact *= i;  
       /*while(compare_fact % 10 == 0)
           compare_fact /= 10;
       compare_fact %= 100000;*/
       //compare_fact = overflow(compare_fact, i, 100000);       
-    }
-    puts("after for loop number 2");
-    while(compare_fact % 10 == 0)
-      compare_fact /= 10;
-    compare_fact %= 100000;
-    puts("test");
-    if(compare_fact != local_fact)
-      puts("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
-      printf("  compare_fact: %llu | local_fact %llu\n\n", compare_fact, local_fact);
+    //}
+    //puts("after for loop number 2");
+    //while(compare_fact % 10 == 0)
+    //  compare_fact /= 10;
+    //compare_fact %= 100000;
+    //puts("test");
+    //if(compare_fact != local_fact)
+    //  puts("REEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE\n");
+      //printf("  compare_fact: %llu | local_fact %llu\n\n", compare_fact, local_fact);
     //puts("ENd for loop");
     
     
@@ -137,9 +158,9 @@ boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
                
                 //printf("Loop3 start w:%d q:%d\n", w, q);
                 //printf("Loop2 start w:%d q:%d j:%d\n", w, q, j);
-                collector[q] *= collector[q+w/2];
+                //collector[q] *= collector[q+w/2];
                 
-                //collector[q] = overflow(collector[q], collector[q+w/2], 100000);
+                collector[q] = overflow(collector[q], collector[q+w/2], 100000, true);
                 //printf("Collector[j]: %zu\n", collector[j]); 
                 while(collector[q] % 10 == 0){
                     collector[q] /= 10;
@@ -197,17 +218,20 @@ int main(int argc, char** argv) {
     //MPI_Get_processor_name(processorName, &processSize); 
     srand(time(0));                           // Gives the processor name of current node
 
+    boi result;
     boi fac; 
     //fac = 1000000000000;
     //fac = 20; 
-    fac = 99998; 
+    fac = 50000; 
     //puts("Start factorial!!");
+    boi one = 5000000000;//ULLONG_MAX;
+    boi two = one-1;//ULLONG_MAX;
     
+    boi jawn = overflow(one, two, 100000, true);
+   
+    printf("Jawn: %llu\n", jawn); 
     
-    
-    
-    unsigned long long result = factorial(fac, &world, worldSize, myRank);
-    //size_t results = factorialTest(fac, &world, worldSize, myRank);
+    //result = factorial(fac, &world, worldSize, myRank);
     if(myRank == 0){
         //printf("Ree %zu \n",results);
         printf("eeR %llu\n", result);
