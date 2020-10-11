@@ -112,7 +112,7 @@ boi factorial(unsigned long long fact, MPI_Comm *world, int worldSize, int Rank)
     printf("local_num = %s | Rank: %d \n", local_num, Rank);
 
     MPI_Gatherv(local_num, numLength[Rank], MPI_CHAR, collector, numLength, disp, MPI_CHAR, 0, *world);//TODO
-    //printf("local_fact del %d",Rank);
+    printf("local_fact del %d",Rank);
     del(local_fact);
     //del_str(local_num);
     if(Rank == 0){ 
@@ -120,17 +120,17 @@ boi factorial(unsigned long long fact, MPI_Comm *world, int worldSize, int Rank)
         //I have an array of sum of numLens digits, I need ot slice out worlSize number fo substrings and convert the back to bois
         //strncpy() coppy n bytes from a buffer from on to another buffer
         // 
-        
+        puts("HERE"); 
         int ree;
         for(ree=0; ree<worldSize; ree++){
             char num [numLength[ree]+1];
             strncpy(num, collector+disp[ree], numLength[ree]);
             num[numLength[ree]] = '\0';
-            //printf("word: %s\n", num);
+            printf("word: %s\n", num);
             collectorV2[ree] = makeBigIntStr(num);
         }
        
-    //puts("collect");
+        puts("collect");
     
         int w, q;
         for(w=2; w<(2*worldSize); w*=2){
@@ -208,8 +208,8 @@ int main(int argc, char** argv) {
     unsigned long long fac; 
     
     
-    //fac = 100000000;
-    fac = 1000000000000; 
+    fac = 100000;
+    //fac = 1000000000000; 
     printf("fac: %llu",fac);
     //fac = fac / pow(5.0,7.0);
 

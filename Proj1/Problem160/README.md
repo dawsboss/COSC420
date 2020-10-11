@@ -9,6 +9,8 @@
 #### The goal for this project was to find the f(1,000,000,000,000) or the last 5 digits of the 1 trillion th factorial.
 
 ## Usage:
+First of all the file with the final answer is "SingleFile" 
+
 The best and final version of the code is int the file SingleFile, this was in reference to the BigInt library used. 
 There is a Makefile used that will work so,
     
