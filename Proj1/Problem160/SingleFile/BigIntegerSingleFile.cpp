@@ -516,6 +516,11 @@ extern "C" {
     extern void del_str(char* a){
         delete [] a;
     }
+    extern int c_greq(BigInteger* a, BigInteger* b){
+        if((*a) >= (*b))
+          return 1;
+        return 0;
+    }
 #else
     extern void del_str(char*);
     extern void del(BigInteger* a);
@@ -531,6 +536,7 @@ extern "C" {
     extern const char* c_str(BigInteger* a);
     extern int c_eqeq(BigInteger* a, BigInteger* b);
     extern int c_leeq(BigInteger* a, BigInteger* b);
+    extern int c_greq(BigInteger* a, BigInteger* b);
 #endif
 
 #ifdef __cplusplus

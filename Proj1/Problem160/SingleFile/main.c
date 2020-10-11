@@ -6,6 +6,7 @@
 #include<limits.h> //MAX_INT
 #include "BigIntegerSingleFile.cpp"
 #include<string.h>
+#include<time.h>
 //16576
 
 // Defining the buffer length for processor name
@@ -26,7 +27,7 @@ boi factorial(unsigned long long fact, MPI_Comm *world, int worldSize, int Rank)
     boi zero = makeBigIntStr("0");
     boi ten = makeBigIntStr("10");
     boi one = makeBigIntStr("1");
-    boi tenK = makeBigIntStr("100000000000000000000"); 
+    boi tenK = makeBigIntStr("1000000000000000"); 
 
     unsigned long long srt;
     unsigned long long fin;
@@ -72,36 +73,7 @@ boi factorial(unsigned long long fact, MPI_Comm *world, int worldSize, int Rank)
     //printf("Rank: %d | Start: %llu | Finish: %llu\n", Rank, start, finish);
     for(i=start; 1 == c_leeq(i,finish); c_pp(i)){
         c_mult(local_fact, i);
-        boi modu = c__mod(local_fact, ten);
-        
-        //making faster removing trailing zeros
-        /*int te;
-        int counter = 2;
-        char* modlad = (char*) malloc(1*sizeof(char));
-        //char onee[1] = {'1'};
-        modlad[0] = '1';
-        modlad[1] = '\0';
-        char zeroo [1] = {'0'};
-        char* et = c_str(local_fact);
-        for(te = strlen(et)-1; te>=0; te++){
-            
-            if(et[te] == '0'){
-                counter++;
-                modlad = realloc(modlad, counter);
-                modlad = strcat(modlad, zeroo);
-                printf("modlad: %s", modlad);
-            }else{
-                break;
-            }
-        }
-        boi modladd = makeBigIntStr(modlad);
-        printf("ModLadd: %s\n", c_str(modladd));
-        c_mod(local_fact, modladd);
-        
-        free(et);
-        //free(modlad);
-        del(modladd);*/
-
+        boi modu = c__mod(local_fact, ten);        
         while((c_eqeq(modu, zero)) == 1){
             //printf("LOOP == local_fact: %s | i: %s\n", c_str(local_fact), c_str(i));
             del(modu);
@@ -109,7 +81,8 @@ boi factorial(unsigned long long fact, MPI_Comm *world, int worldSize, int Rank)
             modu = c__mod(local_fact, ten);
         }
         del(modu);
-        c_mod(local_fact, tenK);
+        if(c_greq(local_fact, tenK) == 1)
+            c_mod(local_fact, tenK);
         //printf("local_fact: %s | i: %s | Rank %d\n", c_str(local_fact), c_str(i), Rank);
     }
     //printf("71 %d\n", Rank);
@@ -178,7 +151,7 @@ boi factorial(unsigned long long fact, MPI_Comm *world, int worldSize, int Rank)
         rtn = collectorV2[0]; 
         //puts("rtn = ");
         //printf("%s\n", c_str(rtn));
-        c_mod(rtn, tenK);
+        //c_mod(rtn, tenK);
         for(w=1; w<worldSize; w++){
             del(collectorV2[w]);
         } 
@@ -225,25 +198,31 @@ int main(int argc, char** argv) {
 
     //p
     //puts("Testing");
+    clock_t start;
+    if(myRank == 0){
+       start = clock();
+    }
 
     boi result;
     boi finalMod = makeBigIntStr("100000");
     unsigned long long fac; 
     
     
-    //fac = 1000000000;
+    //fac = 100000000;
     fac = 1000000000000; 
     printf("fac: %llu",fac);
     //fac = fac / pow(5.0,7.0);
 
     result = factorial(fac, &world, worldSize, myRank);
     if(myRank == 0){
+        clock_t end = clock();
+        double timeSpent = (double) (end-start) / CLOCKS_PER_SEC;
         const char* reesult = c_str(result);
         printf("Fac: %llu | Result: %s\n", fac, reesult);
-        c_mod(result, finalMod);
+        //c_mod(result, finalMod);
         //printf("Ree %zu \n",results);
-        printf("Fac: %llu | Result: %s\n", fac, reesult);
-        printf("WORLD SIZE: %d\n", worldSize);
+        //printf("Fac: %llu | Result: %s\n", fac, reesult);
+        printf("WORLD SIZE: %d | Time: %f \n", worldSize, timeSpent);
         //del_str(reesult);   
     }
     //M
