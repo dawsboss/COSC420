@@ -1,4 +1,7 @@
-main: Template.c
-	mpicc -o main Template.c -g
+main: Template.o
+	mpicc -o main Template.o -g -lm
+Template.o: Template.c
+	mpicc -c Template.c -g
+
 clean:
 	rm -f *.o main
