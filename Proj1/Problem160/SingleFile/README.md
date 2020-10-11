@@ -16,6 +16,20 @@ There is a Makefile used that will work so,
     ./main (OR) mpirun -n # ./main (OR) sbatch P160.sh
     
 
+## Analysis of the code:
+There is a time function in the code so the code will print how long it took when ran.
+But I will analyse the operation it takes. 
+
+NOTE: I will be ignoring the cpp files operation I used this from one else.
+
+#### Main:
+The main it's self/excluding the factorial function is extremely simple. All it needs to do is give a unsigned long long number to foactorial receive a big Int and then print. So all in all a constant amount fo work.
+
+#### Factorial:
+    The number of operation is 22 + ( Fac/worldSize * 5 * 3*numofTrailingZeros ) + 4 + GatherAll + 3 + 2*worldSize + 1 + GatherV + worldsize*4*numofTrailingZeros + 1 + worldSize + 6
+
+This is in order so this may seem randly made but I went through the cod eline by line. I was not sure if we needed a dirrect counter but the number will change based on the number of node you will have. There will be more compuation done if you have mode nodes not from the calculation of factorial but from the setup and clean up of the numbers. The lasst loop of collecting wont run if there is on processor but the more there are the more nodes it needs to grab numbers from.
+
 ## Approach
 Initially thought that this problem would be ver easy and that it would be the easiest 60% problem. What I failed to realize is that the 1 trillion th factorial is 10^10^13.06317213025609 . In other words it is a massive number and to get it would not only take a ton of computations. What I did not take into consideration was how I was going to do the computations. The computations for factorial in it's self is extremely simple. Just multiply by the number you are taking and by all the numbers that follow it down to one. But for a computer this is hard because a computer can only hold such a large number. My end result turned into me using a Big Int library that turned the number into a string and did operations on it in c plus plus. Each proecessor gets different chunks of the factorial that is to be caculated and since multiplication is comunitive I multiply them all together in the end. Also as the multiplications are happening in each processor the results are being modded and stripped of all trailing zeros. This adds mroe time for one compuation but would aid in the fight for overflow and memory usage. 
 
@@ -37,8 +51,20 @@ I called the problem the unknown because I am not sure of the problem yet. I ran
 #### Problem 6 continued...
 It is the next day and I went to see fi my code was done and we have hit 20.5 hours. I was nervous of this so I went to do some more testing and I discovered something alarming. The code isn;t wokring, the code is actually messing up somewhere with taking the mod... I added 10^20 for the mod so we could "move the error away" from the last 5 digits of the number. But there seems to be a problem or there is to much going on for the BigInt Library. I have to settle with using 10^15. Althought still massive I have been running my coce on the 10^20 for 20.5 hours and the project is due in 12.5 hours. We may not be able to get an answer by then but we know if it is not working where to put some work into. The mod dunction for the BigInt cpp file needs to be able to handle larger numbers. 
  
+### Solution to problems:
 
+On the second to last day I found some interesting readings that I wish I would have found earlier. I am sure this would give me correct answers and increase speeds. 
 
+https://www.nctm.org/tmf/library/drmath/view/71768.html
+
+This is the basic but then someone else also piosted to the same fourm where the conversation continued and shead more light on a solution.
+
+https://www.nctm.org/tmf/library/drmath/view/78186.html
+
+Putting these two toghether I am sure I could have a better solution than this brute force method I came up with. Ignoring numbers crossed my mind but I never took the thought serious enough nore did I realize there were so many numbers that I could ahve "skipped" or atleast reduced. It was also interesting to see paterns arise from this reduiction. It was sad to see so late in the project to know that I could be doing something better and not have the time to implement.
+
+## Results:
+My end results left me wioth a program that I knew worked for 10 billion factorial but the 1 trillion was not able to be tested in time. since the code was able to work for 10 billion I would assume it could also work for 1 trillion. I started running the code for 1 trillion at 12:00pm Oct 11.  
 
 
 
