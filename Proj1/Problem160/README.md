@@ -1,6 +1,6 @@
 # Project 1 - Problem 160 - 60%
 ## Factorial trailing digits
-#### FOr any N, let f(N) be the last five digits before the trailing zeros in N!
+#### For any N, let f(N) be the last five digits before the trailing zeros in N!
 #### For exsample
     9! = 362880 so f(9)=36288
     10! = 3628800 so f(10)=36288
@@ -56,6 +56,7 @@ Another addition to be made to the continuation is that I found two causes of er
 MPI_Gather and other functions take int* so only int arrays, so I cannot have a variety of unsinged long longs, which I imagine are screwing up some overflow when I do 1 trillion factorial.
 
 BigInt library modulus is another cause. I said this already, but I am repeating it with more time under my belt and experimentations that the mod doesn't work for large enough numbers. I would imagine this is where that small error is coming from that I mention throughout this readme. In smaller numbers are leaked in, but the error grows fast when the number gets big enough. This would have to be in the CPP, and the way to developer implemented their modulus function fo the BgiInt type. With more time, I could have tried and solved this problem or made something to work a little more that could be dumbed down than bit counting. 
+
  
 ### Solution to problems:
 
@@ -70,8 +71,12 @@ https://www.nctm.org/tmf/library/drmath/view/78186.html
 Putting these two together, I am sure I could have a better solution than this brute force method I came up with. Ignoring numbers crossed my mind, but I never took the thought seriously enough, nor did I realize there were so many numbers that I could have "skipped" or at least reduced. It was also interesting to see patterns that arise from this reduction. It was sad to see so late in the project that I could be doing something better and not have the time to implement.
 
 ## Results:
-My end results left me with a program that I knew worked for 10 billion factorial, but the 1 trillion could not be tested in time. Since the code could work for 10 billion, I would assume it could work for 1 trillion. I started running the code for 1 trillion at 12:00pm on Oct 11.  
+My end results left me with a program that I knew worked for 10 billion factorial, but the 1 trillion could not be tested in time. Since the code could work for 10 billion, I would assume it could work for 1 trillion. I started running the code for 1 trillion at 12:00pm on Oct 11. 
 
+I cancled the running from 12PM on the 10/11 at 10PM. I tried to mess with an idea where I can do less processing and get the answers. It was noted that I read somewhere (lost the link :/) about a way you can find the last digits of n! by taking the (n/5^x)!. For x that are larger than 3 and for us less than 8. This giuves use the correct last 5 digits. I tried from from x=3 to x=8 and they all gave back the same last 5 digits and all were the last 5 digits of the 1,000,000,000,000! 
+
+## Reflection:
+This project was a complete roller coaster, there were times where I doubted and time where I thought I had vicotry but in the end I got an answer out and it ended unsatisfying. Very unsatisfying. I hated to watch it work for mathmatical reason apposed to my brute force. I was left unsatisfied. 
 
 
 
