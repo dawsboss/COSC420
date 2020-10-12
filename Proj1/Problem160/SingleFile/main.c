@@ -207,18 +207,18 @@ int main(int argc, char** argv) {
     boi finalMod = makeBigIntStr("100000");
     unsigned long long fac; 
     
-    
-    fac = 100000;
-    //fac = 1000000000000; 
+    float x = 8.0;
+    //fac = 200000000;
+    fac = 1000000000000; 
+    fac = fac / pow(5.0,x);
     printf("fac: %llu",fac);
-    //fac = fac / pow(5.0,7.0);
 
     result = factorial(fac, &world, worldSize, myRank);
     if(myRank == 0){
         clock_t end = clock();
         double timeSpent = (double) (end-start) / CLOCKS_PER_SEC;
         const char* reesult = c_str(result);
-        printf("Fac: %llu | Result: %s\n", fac, reesult);
+        printf("Fac: %llu | Result: %s | x: %f\n", fac, reesult, x);
         //c_mod(result, finalMod);
         //printf("Ree %zu \n",results);
         //printf("Fac: %llu | Result: %s\n", fac, reesult);
