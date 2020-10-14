@@ -4,8 +4,6 @@
 #include<time.h>
 #include<math.h>
 #include<limits.h> //MAX_INT
-//#include "BigInt-mast/BigInt.h"
-
 //16576
 
 // Defining the buffer length for processor name
@@ -18,9 +16,9 @@ typedef int bool;
 
 static boi lim = 4294967295;
 
-/*boi overflow(boi a, boi b, int mod, bool first){
+boi overflow(boi a, boi b, int mod, bool first){
     boi rtn;
-    //puts("overflew");
+    //puts("overflew");    printf("    Wokring on a: %llu | b: %llu\n", a , b);
     printf("    Wokring on a: %llu | b: %llu\n", a , b);
     if(a==0 || b==0)
       return 0;
@@ -50,7 +48,7 @@ static boi lim = 4294967295;
 
     printf("    Returning rtn: %llu\n", rtn);
     return rtn;
-}*/
+}
 
 
 
@@ -58,7 +56,6 @@ static boi lim = 4294967295;
 //sbatch P160.sh
 
 boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
-    int mod = 10000000;
     boi* collector = NULL;
     if(Rank == 0)
       collector = (boi*) malloc(worldSize*sizeof(boi));
@@ -86,11 +83,7 @@ boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
     boi i;
     printf("Rank: %d | Start: %llu | Finish: %llu\n", Rank, start, finish);
     for(i=start; i<=finish; i++){
-        local_fact *= i;
-        while(local_fact % 10 == 0)
-            local_fact /= 10;
-        while(local_fact / mod > 1)
-            local_fact %= mod;
+        local_fact = overflow(local_fact, i, 100000, true);
     }
     printf("local_fact: %llu\n", local_fact);
     MPI_Gather(&local_fact, 1, MPI_UNSIGNED_LONG_LONG, collector, 1, MPI_UNSIGNED_LONG_LONG, 0, *world);
@@ -101,20 +94,20 @@ boi factorial(boi fact, MPI_Comm *world, int worldSize, int Rank){
         for(w=2; w<(2*worldSize); w*=2){
             for(q=0; q<worldSize - w/2; q+=w){
                
-                collector[q] *= collector[q+w/2];
+                collector[q] = overflow(collector[q], collector[q+w/2], 100000, true);
                 while(collector[q] % 10 == 0){
                     collector[q] /= 10;
                     //puts("oh no");
                 }
-                while(collector[q] / mod >= 1)
-                    collector[q] %= mod;
+                collector[q] %= 100000;
                 
             }
         }
         rtn = collector[0]; 
 
+        if(rtn >= 100000)
+          rtn %= 100000;
         free(collector);
-        rtn %= 100000;
         return rtn;
     }
     return -1;
@@ -148,21 +141,21 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(world, &myRank); // Gives the rank (number) node
     srand(time(0));                           // Gives the processor name of current node
 
+    puts("Testing");
+
     boi result;
     boi fac; 
-    fac = 1000000000000; 
+    fac = 50000; 
     
-    fac = fac / pow(5.0, 7.0);
-
     boi one = 5000000000;//ULLONG_MAX;
     boi two = one-1;//ULLONG_MAX;
     
-    //boi jawn = overflow(one, two, 100000, true);
+    boi jawn = overflow(one, two, 100000, true);
    
-    //printf("Jawn: %llu\n", jawn); 
+    printf("Jawn: %llu\n", jawn); 
     
-    result = factorial(fac, &world, worldSize, myRank);
-    if(myRank == 0){
+    //result = factorial(fac, &world, worldSize, myRank);
+    /*if(myRank == 0){
         //printf("Ree %zu \n",results);
         printf("eeR %llu\n", result);
         printf("WORLD SIZE: %d\n", worldSize);
@@ -175,7 +168,7 @@ int main(int argc, char** argv) {
         }else{
             puts("REE");
         }
-    }
+    }*/
     MPI_Finalize(); // Finalizing MPI
 
     return 0;

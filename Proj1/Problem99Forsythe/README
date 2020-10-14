@@ -1,0 +1,7 @@
+Brock Forsythe | Ryan Rosiak | Grant Dawson
+This program reads in file base_exp.txt and uses parallel processing to find largest exponential number.
+Compile with Mpi3-2.
+Run with mpiexec -n "desired nodess" ./main base_exp.txt
+
+Currently the program could be improved by implementing the Big Int library to calculate the full size of the calculated integer.
+The code does, however, use the desired number of nodes and split the 1000 lines into smaller portions to calculate the max int faster.

@@ -1,0 +1,188 @@
+Ryan Rosiak
+COSC 420-001
+Project 1 Problem 282
+10/11/20
+
+To run:
+
+sbatch slurm.sh
+Watch from the queue
+
+The Ackermann Function:
+
+The Ackermann Function is one of the fastest growing functions ever. It involves
+two inputs where it the function will recursively call itself over and over again
+until it brings each input to 0. This function grows so large, that numbers where
+inputs are 4,4 and higher get into over 10000 digits long. This is a large task to 
+deal with. My solution is described below.
+
+Computational Complexity:
+
+Overall, the computations needed to compute each number vary. For Ackermann
+function where M <= 3, there is O(c) time. They take one and two computations.
+For ackermann M = 4, knuth arrow 2 and 1 is needed to be calculated. It would
+be O(2log2n). For ackermann M = 5, knuth arrow 3 and 2 and 1 is needed to be
+calculated. It would be O(3log2n). For ackermann M = 6, knuth 4 and 3 and 2 and 1 is
+needed to be calculated. It would be O(4log2n). For each upgrade of knuth arrow, that 
+knuth arrow would be knuth arrow - 1 larger of an n than the previous. So n grows
+exponentially. (i.e. knuth arrow 3 has knuth arrow 2 copies of 2 more than
+knuth arrow 2). The parallelization for knuth arrow 3 and 4 would add some
+overhead as well as a +n for come copying of numbers.
+
+Problems along the way:
+
+1. Stack Overflow
+
+When I first saw this problem, I thought that it wouldn't be too bad. I 
+knew that the ackermann function was recursive and I could fit the function
+in to a very easy recursive function that C would be able to handle very
+nicely. I realized that for the amount of numbers that I needed to 
+calculate, I was stack overflowing wayyyy to fast. So, I decided that I would
+compute the ackermann numbers using the function parameters iteratively. This 
+would make it impossible for the stack to overflow, and allow my code to run
+in full.
+
+2. I need a stack?
+
+In order to run the iterative case, I needed to create my own stack
+functions/library. I didn't need too much more than basic functionality,
+so I decided to run create my own. This wasn't too hard, but definitely 
+took me a day to convert my C++ code to C.
+
+3. Data Types 1
+
+The first issue I ran into was data type problems with integers. I was sure
+that with the iterative case, no matter how long it needed, I could compute
+the numbers, but I didn't have a data type to hold how big the numbers were. Little
+did I know how big the numbers would truly get. So I went with the largest
+that C allowed me to create by default -> unsigned long long
+
+4. Closed Forms
+
+I soon started to realize that there was a lot of iterations. I MEAN A LOT.
+So much so that using wolfram alpha to calculate non parallel forms of the 
+calculations could take upwards of 60 years!!!!! I knew that there had to 
+be an easier way. With the help of my professor I found closed forms for 
+every input to get my solution. That was a huge relief. So I decided to chalk
+the loop and the stack and work with the closed forms to get rid of a lot
+of loop overhead.
+
+5. Memoization
+
+I did want to try and memoize my function when running the iterative case. When
+writing up the stack list, with some help of online ackermann visulaizers, I could
+see that my stack would get outrageously large with the amount of saved calculations.
+This was not practical with the amount of memory that I had to work with. This possible
+solution never manifested itself.
+
+6. Knuth Arrows
+
+The first 4 ackermann calculations I needed were no more than basic algebra. I 
+could compute those in my sleep. Sadly, I had to learn about a Knuth arrow. These
+knuth arrows are a shortcut for exponentiation, tetration, pentation, etc. To 
+understand how large of numbers I was really dealing with, I started to solve
+small cases on my own and realized that the numbers I was dealing with were
+nearly 5000+ digits long! So, I was forced to move on to my next solution.
+
+7. Data Types 2
+
+My professor had repeatedly gave me the idea for a big integer library. But,
+there was just one problem, most of these libraries weren't even written in C!
+There were some libraries that I looked at like BigDigit, LibGMP, and a 
+custom library on Github. These all failed to meet the mark. Whether it 
+be a library that had no working download / couldn't be unzipped correctly (libGMP), or
+a library that had actually wasn't a big digit library and couldn't hold numbers
+larger than 15 digits (BigDigit), or even some outright didn't compute the large
+numbers correctly, there was only one library left that could possibly be of
+use. This was BigInteger and it was C++!
+
+8. Data Types 3
+
+After a long goose hunt, my professor showed me how I could use C++ code 
+in C using some very gross operations that are built deep in the C and C++
+languages. My professor and I implemented the BigInteger Library using 
+a special keyword called "extern" along with some special compilation steps
+in order to get C++ and C code to run alongside each other. This ended up 
+working well. It took some time to understand what was happening, but the 
+library did do its job (or so I thought).
+
+9. Parallelism 1
+
+Since this project had to be run in parallel, I had to create a
+mpicc wrapper that wrapped around g++ instead of gcc so that the compilations
+would run successfully.
+
+10. Exponentiation
+
+I was so close that I could almost taste it. With the BigInteger library in
+hand, I could now compute numbers that were larger than I could ever imagine, given
+I had enough memory. I needed to call my knuth arrow functions with the C
+pow function. This would not work because I was using the BigInteger library. The library
+also did not have its own exponent function. So I decided to divide up the
+work and create a loop that would multiply the base however many times need
+be. This worked for smaller knuth arrows, but the numbers I was working with
+needed a faster option. For this, I decided to solve the exponent problem using
+the iterative log2n method rather than the n method. This would make the amount
+of time for the number to be solved within this lifetime, as well as allow 
+me to parallelize much easier. I finally had functions that could compute the 
+numbers I needed. 
+
+11. Modulus
+
+Throughout the whole process, I needed to keep modulus rules in mind. The two
+main rules were addition and multiplication using modulus. This was because
+I wanted to try to keep the numbers smaller, if possible, in order to reduce
+the weight of moving such large numbers around in the code. This would prove to 
+be a blessing and a curse, for I could only modulus certain portions, because I needed
+to keep the numbers from my knuth arrow functions in tact. So I had to mod where
+I could, and work with outrageously large numbers in other places. This problem
+led to me having to make multiple versions of functions like my powIter and 
+powIterMod function so that I could take advantage of smaller numbers in some 
+functions while running the larger and slower cases on others.
+
+12. Parallelism 2
+
+Parallelizing seemed to be easy on paper. I knew that I could just let one 
+processor compute each ackermann number, so I started with that. When 
+computing large numbers with powIter, I realized that I needed a large 
+amount of processors to divide up the work of the exponentiation, because 
+I was taking 2 ^ 10000 digit number. I started to let my processers help 
+with knuth arrow 3 and 4, using gatherv and broadcast to gather all the 
+local computations, and then broadcast the final result out, respectively. This
+idea was the final building block for a solution, but the unthinkable would
+end up happening.
+
+Current Issues: 
+
+I am 100% positive that for smaller numbers, my code works. Using the test
+cases provided in the file, I can prove that all of my functions get me 
+the correct answers. There is one overlying problem that is plagueing my 
+code from achieving the final answer. This is the fact that the BigInteger
+library cannot handle the size of the numbers I am giving it. I am not
+completely sure if this is because of shortage of memory, or because the string
+that is holding these values is eventually overflowing on itself, but there
+is a memory corruption happening. I have computed the knuth arrows of 
+knuth arrow 3 and 4 up  (2,4). These all work. The numbers are very large,
+but the correct solution is provided. The sad thing is, once I use (2,5), 
+I get a memory corruption. I believe this is because the numbers are way
+too large. I have debugged my code for days, freeing up as much memory as
+possible while rewriting code for easy accessibility but there is no 
+information given when the memory corruption occurs. It just crashes out. Not 
+only this, but I need to compute (2,7->8->9). I cannot make it past (2,4). The size
+of the number that I recorded for (2,4) was 10346 digits. Meaning that double
+that in exponentiation is outrageously large. I wish I knew a way to shorten 
+the calculations, or even skip a certain amount of calculations, but this is
+where I am stuck. I thought that the closed forms would get me a shorter way of
+solving the problem, but has continued to hold me back.
+
+Possible Solutions:
+
+If I can out why my memory is being corrupted, I can fix this and get my solution. 
+The code is parallelized and works well on the cluster as well as on one
+computer. This is with smaller numbers of course, but with the large numbers, the 
+nodes will stall out (assuming this is because of the known memory corruption). I believe
+that there could be a way to cut out a certain amount of calculations in the
+powIter function. This could help. The only thing I can't fix is the dependency 
+between the knuth arrows. One knuth arrow needs the one below it and so forth. 
+This is something that would need further proofs and reductions to see if I could
+workaround this dependency. 
