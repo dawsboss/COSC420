@@ -1,0 +1,53 @@
+Ryan Rosiak
+COSC 420-001 Metadata Module
+11/15/20
+
+Description:
+
+There are two scripts that are contained by this folder. Caldata.c is a script that
+calculates the metadata that is needed for me to create a script to get all of the 
+papers into one structured file. Some of the data that is calculated is the max
+size string of each metadata parameter, number of papers, and file size. This is all 
+used in further script calculations. The main script (writedata.c) does two things. It 
+reads in all metadata for each paper and places them into a struct and 
+1. Writes to file called indexfile which holds each paper's id paired with a given
+index 
+2. Writes to 10 files called metastruct# which are every paper's metadata split into
+10 files so that they can be read in using multiprocessing in the future
+These scripts are pivotal to the preprocessing needed to implement a solution to this 
+project.
+
+Files that need to be generated before hand:
+
+- arXiv-metadata.txt
+
+General Outline:
+
+The caldata script simply goes line by line in the file. Since every paper consists of 
+5 lines of data, every 5th line is marked to count the number of papers. Every parameter
+is in the same place for every 5 lines, so, 5 maxes are calculated to find the max
+string numbers for each data parameter. All lines are counted to find the number of lines
+in the file. For the writedata script, a loop that loops the amount of papers there are 
+in total (1628188), and then takes in 5 strings at once, creating a MetaNode struct
+with the data pulled in and an IndexNode. The IndexNode structs are written to a file
+once the loop is over. The MetaNode, however, is split into a for loop counting 10 for each
+file that it has to create. The order is still n, but the process is split in 10 successive
+steps. In total, the caldata script runs O(n + O) and the writedata script runs O(n + O) (O being
+a constand amount of read/write overhead that comes with the process.
+
+How to run:
+
+- Type "make"
+
+- ./writedata
+or
+- ./caldata
+
+Current Issues:
+
+No known current issues. No leaks and all problems accounted for. These files take about 
+13 minutes to be written.
+
+**There are SO MANY COMMENTS, reading that program is a literal picture book. Please try it!!!
+**Files are written for full cases. These files are tested for working by how they are used in
+our other algorithms. That is testing in itself.

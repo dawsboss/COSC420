@@ -77,7 +77,7 @@ int main(int argc, char** argv) {
       strcat(buf, tmp);
     }
 
-    printf("I am node %d and my is %s", myRank, buf);
+    printf("I am node %d and my is %s\n", myRank, buf);
 
 
     free(local_arr);

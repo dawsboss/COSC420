@@ -34,14 +34,18 @@ void copyMatrix(Matrix*, Matrix*);
 void printMatrix(Matrix*);
 // Addition of matrices
 double* addMatrices(Matrix*, Matrix*, MPI_Comm*, int, int);
+// Addition of matrices in serial
+double* addMatricesSerial(Matrix*, Matrix*);
 // Subtraction of matrices in parallel
 double* subtractMatrices(Matrix*, Matrix*, MPI_Comm*, int, int);
 // Subtraction of matrices in serial
-double* subractMatrices(Matrix*, Matrix*);
+double* subractMatricesSerial(Matrix*, Matrix*);
 // Multiplication of matrices in parallel
 double* multMatrices(Matrix*, Matrix*, MPI_Comm*, int, int);
 // Multiplication of a matrix and a constant
 double* multMatrixConst(Matrix*, double, MPI_Comm*, int, int);
+// Multiplication of a matrix and a constant in serial
+double* multMatrixConstSerial(Matrix*, double);
 // Multiplication of matrices in serial
 double* multMatricesSerial(Matrix*, Matrix*);
 // Transpose of matrix

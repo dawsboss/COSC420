@@ -219,10 +219,32 @@ double* subtractMatrices(Matrix *a, Matrix *b, MPI_Comm *world, int worldSize, i
     return rtn;
 }
 
+
+// Add matrices in serial
+double* addMatricesSerial(Matrix* a, Matrix* b) {
+    if (a->rows != b->rows || a->cols != b->cols) {
+        puts("Wrong dimensions");
+        printf("A- rows: %d x cols: %d || B- rows: %d x cols: %d\n", a->rows, a->cols, b->rows, b->cols);
+        return NULL;
+    }
+    //printf("a rows: %d a cols: %d\n", a->rows, a->cols);
+    //printf("b rows: %d b cols: %d\n", b->rows, b->cols);
+
+    double* rtnMe = (double*)malloc(a->rows*a->cols*sizeof(double));
+    int i;
+    for (i = 0; i < a->rows*a->cols; i++) {
+        rtnMe[i] = a->data[i] + b->data[i];
+    }
+    return rtnMe;
+}
+
+
+
 // Subtract matrices in serial
 double* subtractMatricesSerial(Matrix* a, Matrix* b) {
     if (a->rows != b->rows && a->cols != b->cols) {
         puts("Wrong dimensions");
+        printf("A- rows: %d x cols: %d || B- rows: %d x cols: %d\n", a->rows, a->cols, b->rows, b->cols);
         return NULL;
     }
     //printf("a rows: %d a cols: %d\n", a->rows, a->cols);
@@ -240,6 +262,7 @@ double* subtractMatricesSerial(Matrix* a, Matrix* b) {
 double* multMatrices(Matrix *a, Matrix *b, MPI_Comm *world, int worldSize, int myRank) {
     if (a->cols != b->rows) {
         puts("WRONG, dimensions do not match matrix multiplication formula");
+        printf("A- rows: %d x cols: %d || B- rows: %d x cols: %d\n", a->rows, a->cols, b->rows, b->cols);
         return NULL;
     }
     
@@ -296,7 +319,8 @@ double* multMatrices(Matrix *a, Matrix *b, MPI_Comm *world, int worldSize, int m
 // Multiply matrices in serial
 double* multMatricesSerial(Matrix* a, Matrix* b) {
     if (a->cols != b->rows) {
-        puts("WRONG, dimensions do not match matrix multiplication formula");
+        puts("WRONG, dimensions do not match matrix multiplication formula"); 
+        printf("A- rows: %d x cols: %d || B- rows: %d x cols: %d\n", a->rows, a->cols, b->rows, b->cols);
         return NULL;
     }
 
@@ -315,7 +339,7 @@ double* multMatricesSerial(Matrix* a, Matrix* b) {
     return rtnMe;
 }
 
-// Transposes the given matrix
+// Transoses the given matrix
 // CAN ONLY BE USED BY ONE NODE
 // Returns a pointer to an array that is the transposed matrix
 // Matrix that is accepting this argument must be transposed dimensionally already
@@ -371,6 +395,23 @@ double* multMatrixConst(Matrix* a, double b, MPI_Comm *world, int worldSize, int
         return rtn;
     return NULL;
 }
+
+
+// Multiply matrices in serial
+double* multMatrixConstSerial(Matrix* a, double b) {
+    double* rtn = (double*)malloc(a->rows*a->cols*sizeof(double));
+    int i;
+    for (i = 0; i < a->rows*a->cols; i++) {
+         rtn[i] = a->data[i] * b;
+    }
+    return rtn;
+}
+
+
+
+
+
+
 
 // Calculates the inner product of two matrices
 // MUST ENTER COLUMN VECTORS!!!!
@@ -847,7 +888,6 @@ double* EigenVectorFile(int dims, MPI_Comm* world, int worldSize, int myRank) {
 
     // Each node malloc their "chunk" of a
     int Varray[worldSize];
-    int disp[worldSize];
     for (i = 0; i < worldSize; i++) {
         Varray[i] = (dims / worldSize) * dims;
     }
@@ -879,7 +919,6 @@ double* EigenVectorFile(int dims, MPI_Comm* world, int worldSize, int myRank) {
     int count = 0;
     double length;
     double* difference = NULL;
-    double errorTolerance = 0.0000000000000001;//pow(10,-16);
     int done = 0; 
 
     if (a.rows == 0) {

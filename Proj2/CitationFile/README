@@ -1,0 +1,102 @@
+Ryan Rosiak
+COSC 420-001 Citation Module
+11/15/20
+
+Description:
+
+This script creates the adjacency matrix from the arXiv-citations.txt file and my own
+genereated indexfile. The adjacency matrix is used for the pagerank and hits algorithm.
+Overall, the concept for the script was simple, but, there were a lot of problems that
+came in to play and these will be discussed below.
+
+Files that need to be generated before hand:
+
+- arXiv-citations.txt
+- indexfile (can be generated from the MetaData folder and moved to this location)
+
+General Outline:
+
+This script uses many different tactics to achieve it's goal. The algorithm reads in
+from indexfile, which is a file of structs that contain the id of each paper from 
+arXiv-metadata.txt and an assigned index number. This is used to make sure that every
+paper is accounted for in the arXiv-citations.txt file. Those structs with corresponding
+id's and indices are placed into a binary search tree so that they can be referenced 
+later. They are also held in a large array so that they can be iterated over in the main
+script loop. The arXiv-citations.txt file is scanned for id's and the corresponding byte
+number that the line appears in the file. This data is also placed into a binary 
+search tree. The main loop works as such, for every paper in the struct array, retrieve
+the byte location of that id in the arXiv-citations.txt file and move the file cursor
+to that location. Then, use the structure of the file to parse out the id's that the 
+current paper points to. For each paper that the current paper points to, fill in the
+corresponding index in the row matrix with a 1 (in accordance to the adjacency matrix
+rules where entry i points to entry j). This process of filling ones is done by searching
+the binary search tree containing the struct metadata for a matching id to the the ones
+that are "cited". This will return the index to change to a 1. Once we complete a row in
+the matrix, we will write that row to matrixfile. Continue to do this until all papers 
+from the indexfile have a row filled with 1's and 0's.
+
+How to run:
+
+- Type "make"
+
+- ./writematrix
+
+Current Issues:
+
+The program currently works. It has been thoroughly tested to ensure that all cases
+work without a doubt. The current issue is for full use. In total, there are 1628188 
+papers. Therefore, the script must be very efficient to complete in a reasonable amount
+of time. 
+
+1. Amount of time it takes
+
+Explantation with possible solutions:
+
+Right now, my program is O(2nlogn + (n^2)2logn). Loading up all of the data to make the
+script reasonable takes nlogn to read the arXiv-citations.txt file and insert that
+data into a binary search tree and nlogn to load the indexfile structs into an array
+and then load that data into a binary search tree. Both of the binary search trees allow
+the script itself to run in n^2logn time. This is because we have to run n on the array
+of structs, n for the filling of the array of all 0's, and then 2logn for 2 searches 
+that are done for index data. On top of all of this, there is also read/write overhead 
+that definitely adds some from of a constant on top of everything. When you look at all 
+these factors and the fact that there is over 1 million papers, the timing adds up. 
+Currently, the loading of the structs from index file takes the 2nd longest, because 
+there is so much data being allocated and thrown around, as I bring the limit closer
+to the amount of papers that are actually in the file, the loading takes outrageously long.
+This can take upwards of and hour or more. Once this is done, the main algorithm takes
+a very long time as well. Sadly, there is no way to make this algorithm faster without 
+a new arXiv-citations.txt file or some sort of possible parallelization. This is because
+when creating a naive algorithm for the arXiv-citations.txt algorithm, I found that 
+about 200000 papers were missing from the file. Many papers in the file have no citations,
+but these papers were flat out missing. Therefore, I needed to make my algorithm faster
+for searching by creating a binary tree where I could use my index structs (which I knew
+were all of the papers) and iterate over then while using the position in the file (using ftell)
+as a way to quickly navigate the arXiv-citations.txt file without creating quadratic 
+time increase. I could not get away with looping and filling the row matrix with all 0's
+because C does not like writing purely memset double bytes to a file. It considers them 
+uninitialised regardless. Therefore I had to pay that one linear cost to add a minor portion
+of quadratic time. The other way that I shortened the time was by adding the second binary
+tree to hold the index struct info. This would allow me to search for a matching index in
+logn time rather than linearly looking through the metadata file for each "cited" id. I could
+just get an index back and voila. The big O is not too bad. The algorithm uses many 
+techniques to greatly reduce the time. Without these processes the algorithm would take
+eons. Computationally, I estimate that the algorithm would take around 15 hours to complete.
+Sadly, I have not had enough time to let it run for that long as I have been trying to reduce
+this time to a few hours. The amount of papers is tough but I know that there could be more 
+that I could do with more time. I could make this better with some sort of parallelization. I could
+I was thinking that maybe I could parallelize the reading in of structs and have multiple
+bst's and search multiple but this would create a lot of weirdness inside the algorithm itself. 
+I was not sure if this would work. Other than parallelization, I believe that this algorithm
+just needs a lot of time to complete. I can only think of one other way which would be to 
+rewrite the script that created the arXiv-ciations.txt file to contain all of the papers. This 
+would allow me to iterate one file and cut having to search and index out of the picture.
+
+Extra Comments:
+
+**Currently, the file is only reading in a portion of the structs and a small portion 
+of the actual algorithm to show that it works. This can be easily changed by changing the 
+loop counter limits to num_papers instead of a literal value.
+**There are SO MANY COMMENTS, reading that program is a literal picture book. Please try it!!!
+**The file is set up to show that it works. The program can run on any case, it is 
+just a matter of how long it runs.

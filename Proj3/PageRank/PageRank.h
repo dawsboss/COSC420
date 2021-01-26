@@ -14,6 +14,11 @@
 
 // FUNCTIONS
 
-double* pageRank(Matrix*, MPI_Comm*, int, int);
+double* pageRank(int, int, MPI_Comm*, int, int);
+//double* HITS(Matrix*, int, MPI_Comm*, int, int);
+//double* FILEpageRank(int, MPI_Comm*, int, int);//TODO - Make work on more than one node and multiples
+//double* FILE_HITS(int, int, MPI_Comm*, int, int);//TODO Broken - outline but no conrete concepts
+
+double* decompressSerial(int*, int, MPI_Comm*, int, int);
 
 #endif // _PAGERANK_H_
